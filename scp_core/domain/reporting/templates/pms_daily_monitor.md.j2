@@ -1,0 +1,25 @@
+# Daily PMS Monitor
+
+- Monitor run: `{{ run_id }}`
+- As of: `{{ as_of_date }}`
+- NAV: `{{ nav }}`
+- Daily return: `{{ daily_return }}`
+- MTD/QTD/YTD: `{{ mtd_return }}` / `{{ qtd_return }}` / `{{ ytd_return }}`
+- Alerts: `{{ alerts_total }}` total, `{{ alerts_critical }}` critical
+
+## Alerts
+
+{% if alerts_critical > 0 %}
+### Critical
+{% if drawdown_alert %}
+#### Drawdown
+
+- `drawdown_threshold` `portfolio`: Portfolio drawdown exceeds monitoring threshold
+{% endif %}
+{% endif %}
+
+## Informational Statuses
+
+{% for status in informational_statuses %}
+- `{{ status.ticker }}` `{{ status.status }}`: {{ status.message }}
+{% endfor %}

@@ -2,12 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy the requirements and install
-COPY scp_core/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the backend code
+# Copy the pyproject.toml and the package code
+COPY pyproject.toml .
 COPY scp_core /app/scp_core
+
+# Install the package
+RUN pip install --no-cache-dir .
 
 # Set PYTHONPATH so scp_core is discoverable as a package
 ENV PYTHONPATH=/app

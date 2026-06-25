@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Briefcase, Settings, Bell, Sun, Moon, Search, LogOut } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Settings, Bell, Sun, Moon, Search, LogOut, FileText } from 'lucide-react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { MainLayout } from './layouts/MainLayout';
 import { Login } from './features/auth/Login';
 import { AdminPortal } from './features/dashboard/AdminPortal';
 import { UserPortal } from './features/dashboard/UserPortal';
+import { LPStudio } from './features/reports/LPStudio';
 import { useWorkspaceStore } from './store/workspaceStore';
 import { useAuthStore } from './store/authStore';
 import './App.css';
@@ -38,6 +39,7 @@ const Sidebar = () => {
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '24px', flex: 1 }}>
         <Link to="/" style={{ color: location.pathname === '/' ? 'var(--accent-color)' : 'var(--text-secondary)' }}><Briefcase size={24} /></Link>
         <Link to="/dashboard" style={{ color: location.pathname === '/dashboard' ? 'var(--accent-color)' : 'var(--text-secondary)' }}><LayoutDashboard size={24} /></Link>
+        <Link to="/reports" style={{ color: location.pathname === '/reports' ? 'var(--accent-color)' : 'var(--text-secondary)' }}><FileText size={24} /></Link>
         {role === 'ADMIN' && (
           <Link to="/admin" style={{ color: location.pathname === '/admin' ? 'var(--accent-color)' : 'var(--text-secondary)' }}><Settings size={24} /></Link>
         )}
@@ -107,8 +109,10 @@ function App() {
     }
   }, [themePreference]);
 
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <GoogleOAuthProvider clientId={googleClientId}>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -122,6 +126,12 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <AppShell><UserPortal /></AppShell>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <AppShell><LPStudio /></AppShell>
             </ProtectedRoute>
           } />
           

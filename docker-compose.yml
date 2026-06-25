@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: sbecipher
+      POSTGRES_PASSWORD: sbecipher_password
+      POSTGRES_DB: sbecipher_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
   backend:
     build:
       context: .
@@ -9,6 +21,9 @@ services:
       - "8000:8000"
     environment:
       - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://sbecipher:sbecipher_password@db:5432/sbecipher_db
+    depends_on:
+      - db
     restart: always
 
   frontend:
@@ -20,3 +35,6 @@ services:
     depends_on:
       - backend
     restart: always
+
+volumes:
+  pgdata:

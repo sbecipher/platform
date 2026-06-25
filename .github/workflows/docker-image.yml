@@ -1,0 +1,139 @@
+name: Build and Deploy Antigravity SCP Core
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: data-cipher
+  PROJECT_NUMBER: 875978034496
+  LOCATION: us-central1
+  REPO: antigravity
+  IMAGE: scp-core
+  SERVICE: ${{ vars.CLOUD_RUN_SERVICE || 'scp-core' }}
+  RUNTIME_SERVICE_ACCOUNT: ${{ vars.CLOUD_RUN_SERVICE_ACCOUNT || 'project-service-account@data-cipher.iam.gserviceaccount.com' }}
+  SECRET_VERSION: ${{ vars.SECRET_VERSION || '1' }}
+  LSEG_APP_KEY_SECRET: ${{ vars.LSEG_APP_KEY_SECRET || 'lseg-data-app-key' }}
+  LSEG_CLIENT_ID_SECRET: ${{ vars.LSEG_CLIENT_ID_SECRET || 'lseg-data-client-id' }}
+  LSEG_CLIENT_SECRET_SECRET: ${{ vars.LSEG_CLIENT_SECRET_SECRET || 'lseg-data-client-secret' }}
+  CLOUD_RUN_MEMORY: ${{ vars.CLOUD_RUN_MEMORY || '2Gi' }}
+  CLOUD_RUN_CPU: ${{ vars.CLOUD_RUN_CPU || '1' }}
+  CLOUD_RUN_CONCURRENCY: ${{ vars.CLOUD_RUN_CONCURRENCY || '80' }}
+  CLOUD_RUN_TIMEOUT: ${{ vars.CLOUD_RUN_TIMEOUT || '900' }}
+  CLOUD_RUN_MIN_INSTANCES: ${{ vars.CLOUD_RUN_MIN_INSTANCES || '0' }}
+  CLOUD_RUN_MAX_INSTANCES: ${{ vars.CLOUD_RUN_MAX_INSTANCES || '3' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scp_core/requirements.txt
+          pip install pytest httpx
+
+      - name: Run tests
+        run: PYTHONPATH=scp_core pytest scp_core/tests/ -q
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Set image URI
+        run: |
+          echo "IMAGE_URI=${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}" >> "$GITHUB_ENV"
+
+      - name: Authenticate to Google Cloud
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-artifact-pusher@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Ensure Artifact Registry repository exists
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        run: |
+          gcloud artifacts repositories describe "${{ env.REPO }}" \
+            --location="${{ env.LOCATION }}" || \
+          gcloud artifacts repositories create "${{ env.REPO }}" \
+            --repository-format=docker \
+            --location="${{ env.LOCATION }}" \
+            --description="Antigravity SCP Core Docker repository"
+
+      - name: Configure Docker for Artifact Registry
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        run: gcloud auth configure-docker "${{ env.LOCATION }}-docker.pkg.dev" --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build release tags
+        run: |
+          {
+            echo "IMAGE_TAGS<<EOF"
+            echo "${IMAGE_URI}:${GITHUB_SHA}"
+            if [ "${{ github.event_name }}" = "release" ]; then
+              echo "${IMAGE_URI}:${{ github.event.release.tag_name }}"
+              echo "${IMAGE_URI}:latest"
+            elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "${IMAGE_URI}:manual-${GITHUB_SHA::12}"
+            fi
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Build and optionally push image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' }}
+          tags: ${{ env.IMAGE_TAGS }}
+
+      - name: Deploy to Cloud Run
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        run: |
+          gcloud run deploy "${{ env.SERVICE }}" \
+            --image "${IMAGE_URI}@${{ steps.build.outputs.digest }}" \
+            --region "${{ env.LOCATION }}" \
+            --platform managed \
+            --no-allow-unauthenticated \
+            --memory "${{ env.CLOUD_RUN_MEMORY }}" \
+            --cpu "${{ env.CLOUD_RUN_CPU }}" \
+            --concurrency "${{ env.CLOUD_RUN_CONCURRENCY }}" \
+            --timeout "${{ env.CLOUD_RUN_TIMEOUT }}" \
+            --min-instances "${{ env.CLOUD_RUN_MIN_INSTANCES }}" \
+            --max-instances "${{ env.CLOUD_RUN_MAX_INSTANCES }}" \
+            --service-account "${{ env.RUNTIME_SERVICE_ACCOUNT }}" \
+            --set-secrets "LSEG_APP_KEY=${{ env.LSEG_APP_KEY_SECRET }}:${{ env.SECRET_VERSION }},LSEG_CLIENT_ID=${{ env.LSEG_CLIENT_ID_SECRET }}:${{ env.SECRET_VERSION }},LSEG_CLIENT_SECRET=${{ env.LSEG_CLIENT_SECRET_SECRET }}:${{ env.SECRET_VERSION }}"

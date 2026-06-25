@@ -19,6 +19,7 @@ from scp_core.api.routers.oms import router as oms_router
 from scp_core.api.routers.compliance import router as compliance_router
 from scp_core.api.routers.modeling import router as modeling_router
 from scp_core.api.routers.auth import router as auth_router
+from scp_core.api.routers.reports import router as reports_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,6 +48,7 @@ app.include_router(oms_router)
 app.include_router(compliance_router)
 app.include_router(modeling_router)
 app.include_router(auth_router)
+app.include_router(reports_router)
 
 @app.get("/api/portfolio/{portfolio_id}", response_model=PortfolioHoldingsResponse, summary="Get Portfolio Holdings")
 def get_portfolio(portfolio_id: str):

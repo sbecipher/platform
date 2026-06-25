@@ -1,0 +1,21 @@
+# Institutional LP Due-Diligence Brief
+
+Run Context: RUN_ID `{{ run_id }}`; run_root `{{ run_root }}`.
+
+## Strategy Overview
+
+This is a post-deployment, concentrated materials-and-mining portfolio review, not a staged-deployment plan. The selected book is the `{{ strategy_name }}` construction with {{ portfolio_size }} active equity positions, {{ target_equity_weight }}% target equity weight, and {{ cash_weight }}% cash/opportunity sleeve weight. 
+
+## Portfolio Constraints & Exceptions
+
+The strategy enforces a PM Exception Max ceiling for negative NOPAT assets.
+
+{% for exception in exceptions %}
+- `{{ exception.ticker }}`: Cap at {{ exception.cap }}%. Fiduciary caveat: {{ exception.caveat }}
+{% endfor %}
+
+## Factor Exposure & Style Drift
+
+Value factor loading remains extremely elevated:
+Value (HML): {{ value_loading }}
+Quality (RMW): {{ quality_loading }}

@@ -19,7 +19,11 @@ dependencies = [
     "lseg-data>=1.0.0",
     "websockets>=11.0.3",
     "asyncpg>=0.28.0",
-    "alembic>=1.11.0"
+    "alembic>=1.11.0",
+    "pydantic-settings>=2.0.0",
+    "weasyprint>=61.0",
+    "markdown>=3.5.0",
+    "Jinja2>=3.1.0"
 ]
 
 [project.optional-dependencies]
