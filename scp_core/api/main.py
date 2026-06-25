@@ -1,7 +1,9 @@
+import asyncio
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uuid
+from contextlib import asynccontextmanager
 
 # Import our new Pydantic Schemas
 from scp_core.models.schemas import (
@@ -12,10 +14,23 @@ from scp_core.models.schemas import (
     PositionResponse
 )
 
+from scp_core.api.websockets.market_data import router as market_data_router, simulate_market_data
+from scp_core.api.routers.oms import router as oms_router
+from scp_core.api.routers.compliance import router as compliance_router
+from scp_core.api.routers.modeling import router as modeling_router
+from scp_core.api.routers.auth import router as auth_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(simulate_market_data())
+    yield
+    task.cancel()
+
 app = FastAPI(
     title="Sbecipher / scp_core API",
     description="Modernized REST API for portfolio analytics and trading.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Enable CORS for the React Frontend
@@ -26,6 +41,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(market_data_router)
+app.include_router(oms_router)
+app.include_router(compliance_router)
+app.include_router(modeling_router)
+app.include_router(auth_router)
 
 @app.get("/api/portfolio/{portfolio_id}", response_model=PortfolioHoldingsResponse, summary="Get Portfolio Holdings")
 def get_portfolio(portfolio_id: str):
