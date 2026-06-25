@@ -1,0 +1,147 @@
+:root {
+  /* Default Light Theme variables */
+  --bg-primary: #f0f2f5;
+  --bg-secondary: rgba(255, 255, 255, 0.7);
+  --bg-panel: rgba(255, 255, 255, 0.85);
+  
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a68;
+  
+  --accent-color: #4361ee;
+  --accent-hover: #3a56d4;
+  
+  --border-color: rgba(0, 0, 0, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.4);
+  
+  --status-positive: #10b981;
+  --status-negative: #ef4444;
+  --status-warning: #f59e0b;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* System Preference Default to Dark if preferred by system, but we explicitly use .dark class for toggle */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #0f111a;
+    --bg-secondary: rgba(26, 29, 41, 0.7);
+    --bg-panel: rgba(30, 33, 48, 0.85);
+    
+    --text-primary: #f8f9fa;
+    --text-secondary: #a0aabf;
+    
+    --accent-color: #4cc9f0;
+    --accent-hover: #3db8de;
+    
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-glass: rgba(255, 255, 255, 0.05);
+    
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Explicit Dark Theme Class */
+.dark {
+  --bg-primary: #0f111a;
+  --bg-secondary: rgba(26, 29, 41, 0.7);
+  --bg-panel: rgba(30, 33, 48, 0.85);
+  
+  --text-primary: #f8f9fa;
+  --text-secondary: #a0aabf;
+  
+  --accent-color: #4cc9f0;
+  --accent-hover: #3db8de;
+  
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.05);
+  
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  /* Subtle background gradient to make the glass stand out */
+  background-image: radial-gradient(circle at top right, rgba(67, 97, 238, 0.1), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(76, 201, 240, 0.1), transparent 40%);
+  background-attachment: fixed;
+}
+
+.glass-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-glass);
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.text-positive { color: var(--status-positive); }
+.text-negative { color: var(--status-negative); }
+.text-warning { color: var(--status-warning); }
+
+/* TanStack Table Modern Overrides */
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.modern-table th {
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.modern-table td {
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modern-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+  background-color: var(--bg-secondary);
+}
