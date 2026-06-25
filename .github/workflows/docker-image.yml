@@ -51,7 +51,7 @@ jobs:
           pip install pytest httpx
 
       - name: Run tests
-        run: PYTHONPATH=scp_core pytest scp_core/tests/ -q
+        run: PYTHONPATH=. pytest scp_core/tests/ -q
 
   build-and-deploy:
     runs-on: ubuntu-latest
