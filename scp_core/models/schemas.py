@@ -7,6 +7,7 @@ class PositionBase(BaseModel):
     asset_class: str
     quantity: float
     market_value: float
+    latest_price: float = 0.0
     day_profit: Optional[float] = 0.0
     mtd_profit: Optional[float] = 0.0
 

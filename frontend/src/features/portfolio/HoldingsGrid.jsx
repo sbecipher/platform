@@ -12,6 +12,12 @@ export const HoldingsGrid = () => {
   const data = useWorkspaceStore((state) => state.holdings);
   const livePrices = useWorkspaceStore((state) => state.livePrices);
   
+  const fetchPortfolio = useWorkspaceStore((state) => state.fetchPortfolio);
+  
+  useEffect(() => {
+    fetchPortfolio();
+  }, [fetchPortfolio]);
+
   // Connect to the FastAPI WebSocket
   useWebSocket('ws://localhost:8000/ws/market-data');
 
@@ -32,12 +38,13 @@ export const HoldingsGrid = () => {
         cell: info => {
           const symbol = info.row.original.symbol;
           const liveData = livePrices[symbol];
+          const staticPrice = info.row.original.price;
           
           if (liveData) {
             const color = liveData.direction === 'up' ? 'var(--status-positive)' : liveData.direction === 'down' ? 'var(--status-negative)' : 'inherit';
             return <span style={{ color, transition: 'color 0.3s' }}>${liveData.price.toFixed(2)}</span>;
           }
-          return <span>-</span>;
+          return <span>${staticPrice !== undefined ? staticPrice.toFixed(2) : '-'}</span>;
         }
       },
       {

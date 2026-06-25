@@ -28,11 +28,12 @@ manager = ConnectionManager()
 
 # Simulate a Redis Pub/Sub receiver that gets live ticks from LSEG
 async def simulate_market_data():
-    symbols = ['IE', 'UEC', 'AA', 'AMR', 'BTU', 'CDE', 'CLF', 'URG', 'USAR', 'AAPL', 'MSFT', 'TSLA']
+    symbols = ['IE', 'UEC', 'AA', 'AMR', 'BTU', 'CDE', 'CLF', 'URG', 'USAR', 'AAPL', 'MSFT', 'TSLA', 'MT', 'PKX', 'X', 'NUE', 'STLD', 'RS', 'CMC', 'SCHN', 'TX', 'BHP', 'RIO', 'VALE', 'SCCO', 'FCX', 'TECK', 'HBM', 'ERO', 'LUN']
     base_prices = {
         'IE': 18.86, 'UEC': 16.09, 'AA': 58.15, 'AMR': 208.76, 'BTU': 35.01,
         'CDE': 20.75, 'CLF': 14.53, 'URG': 1.65, 'USAR': 23.53,
-        'AAPL': 175.20, 'MSFT': 410.10, 'TSLA': 180.40
+        'AAPL': 175.20, 'MSFT': 410.10, 'TSLA': 180.40,
+        'MT': 63.3, 'PKX': 155.0, 'X': 45.0, 'NUE': 180.0, 'STLD': 120.0, 'RS': 300.0, 'CMC': 55.0, 'SCHN': 25.0, 'TX': 40.0, 'BHP': 60.0, 'RIO': 70.0, 'VALE': 15.0, 'SCCO': 90.0, 'FCX': 40.0, 'TECK': 45.0, 'HBM': 8.0, 'ERO': 20.0, 'LUN': 10.0
     }
     
     while True:

@@ -1,11 +1,12 @@
 import React from 'react';
+import PMSUpload from '../reports/PMSUpload';
 
 export const AdminPortal = () => {
   return (
     <div className="glass-panel" style={{ padding: '24px', margin: '24px' }}>
       <h2 style={{ margin: 0, marginBottom: '24px', color: 'var(--accent-color)' }}>Admin Portal (System Settings)</h2>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
         <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-secondary)' }}>
           <h3 style={{ margin: 0, marginBottom: '12px' }}>Compliance Rules Engine</h3>
           <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
@@ -34,6 +35,13 @@ export const AdminPortal = () => {
           <h3 style={{ margin: 0, marginBottom: '12px' }}>User Management</h3>
           <button className="btn-primary" style={{ width: '100%', marginBottom: '8px' }}>Invite PM / Trader</button>
           <button className="btn-primary" style={{ width: '100%', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>View Audit Logs</button>
+        </div>
+
+        <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-secondary)' }}>
+          <h3 style={{ margin: 0, marginBottom: '12px' }}>Diligence Data Management</h3>
+          <div style={{ marginTop: '16px' }}>
+            <PMSUpload />
+          </div>
         </div>
       </div>
     </div>

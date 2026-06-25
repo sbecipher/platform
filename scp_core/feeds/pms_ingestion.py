@@ -33,9 +33,12 @@ class PMSIngestionEngine:
                             ticker=row['ticker'],
                             as_of_date=datetime.strptime(str(row['as_of_date']), '%Y-%m-%d').date(),
                             current_weight=float(row['current_weight']),
+                            current_notional_usd=float(row['current_notional_usd']),
+                            latest_price=float(row['latest_price']),
                             implementation_gap=float(row['implementation_gap']),
                             band_status=row['band_status'],
                             daily_return=float(row['daily_return']),
+                            daily_return_contribution=float(row['daily_return_contribution']),
                             governance_monitor_status=row['governance_monitor_status']
                         )
                         self.db.add(snapshot)

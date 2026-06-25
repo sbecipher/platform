@@ -69,17 +69,22 @@ def get_portfolio(portfolio_id: str, db: Session = Depends(get_db)):
     positions_db = db.query(PMSPositionSnapshot).all()
     
     pos_responses = []
-    total_nav = sum(p.total_market_value for p in positions_db) or 1.0 # avoid div/0
+    total_nav = sum(p.current_notional_usd for p in positions_db) or 1.0 # avoid div/0
     
     for p in positions_db:
+        # Calculate derived values based on CSV schema
+        quantity = p.current_notional_usd / p.latest_price if p.latest_price and p.latest_price > 0 else 0
+        day_profit = p.daily_return_contribution * total_nav if total_nav > 0 else 0
+        
         pos_responses.append(PositionResponse(
             id=str(p.id),
             symbol=p.ticker,
             asset_class="Equity",
-            quantity=p.shares,
-            market_value=p.total_market_value,
-            day_profit=0.0, # Not in CSV
-            exposure_pct=(p.total_market_value / total_nav) * 100
+            quantity=quantity,
+            market_value=p.current_notional_usd,
+            latest_price=p.latest_price if p.latest_price else 0.0,
+            day_profit=day_profit,
+            exposure_pct=p.current_weight * 100
         ))
         
     return PortfolioHoldingsResponse(
@@ -89,7 +94,7 @@ def get_portfolio(portfolio_id: str, db: Session = Depends(get_db)):
             portfolio_nav=total_nav,
             gross_exposure_pct=sum(abs(p.exposure_pct) for p in pos_responses),
             net_exposure_pct=sum(p.exposure_pct for p in pos_responses),
-            day_pnl=0.0,
+            day_pnl=sum(p.day_profit for p in pos_responses),
             ytd_return_pct=0.0
         ),
         positions=pos_responses

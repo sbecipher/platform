@@ -14,12 +14,55 @@ const xDevHoldings = [
 
 export const useWorkspaceStore = create((set) => ({
   holdings: xDevHoldings,
+  metrics: {
+    totalNav: "$0.00",
+    dayPnl: "$0.00",
+    dayPnlPct: "0.00%",
+    grossExposure: "0.00%",
+    netExposure: "0.00%",
+    portfolioBeta: "0.00",
+    availableCash: "$0.00",
+    activeOrders: "0",
+    isDayPnlPositive: true
+  },
   themePreference: 'system',
   livePrices: {}, // tracks symbol -> { price, direction }
   
   setHoldings: (newHoldings) => set({ holdings: newHoldings }),
   setThemePreference: (theme) => set({ themePreference: theme }),
   
+  fetchPortfolio: async () => {
+    try {
+      const response = await fetch('/api/portfolio/sbecipher_pm_lp');
+      if (response.ok) {
+        const data = await response.json();
+        const formattedHoldings = data.positions.map(p => ({
+          symbol: p.symbol,
+          quantity: p.quantity.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+          price: p.latest_price,
+          value: '$' + p.market_value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+          pnl: (p.day_profit >= 0 ? '+$' : '-$') + Math.abs(p.day_profit).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
+          exposure: p.exposure_pct.toFixed(2) + '%',
+          isPositive: p.day_profit >= 0
+        }));
+        const formattedMetrics = {
+          totalNav: '$' + data.metrics.portfolio_nav.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          dayPnl: (data.metrics.day_pnl >= 0 ? '+$' : '-$') + Math.abs(data.metrics.day_pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          dayPnlPct: ((data.metrics.day_pnl / data.metrics.portfolio_nav) * 100).toFixed(2) + '%',
+          grossExposure: data.metrics.gross_exposure_pct.toFixed(2) + '%',
+          netExposure: data.metrics.net_exposure_pct.toFixed(2) + '%',
+          portfolioBeta: "1.15", // mock beta
+          availableCash: '$150,000.00', // mock cash
+          activeOrders: "4", // mock active orders
+          isDayPnlPositive: data.metrics.day_pnl >= 0
+        };
+        set({ holdings: formattedHoldings, metrics: formattedMetrics });
+      }
+    } catch (err) {
+      console.error("Failed to fetch portfolio:", err);
+    }
+  },
+
   updatePrices: (ticks) => set((state) => {
     const newPrices = { ...state.livePrices };
     ticks.forEach(tick => {
