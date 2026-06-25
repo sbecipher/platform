@@ -23,7 +23,21 @@ class ArtifactStore:
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             zip_ref.extractall(run_root)
             
-        return str(run_root.absolute())
+        artifacts = []
+        for root, _, files in os.walk(run_root):
+            for file in files:
+                if file.endswith(('.csv', '.json', '.png')):
+                    full_path = Path(root) / file
+                    rel_path = full_path.relative_to(run_root)
+                    source_key = file.split('.')[0]
+                    file_type = file.split('.')[-1].upper()
+                    artifacts.append({
+                        "source_key": source_key,
+                        "file_path": str(rel_path).replace('\\', '/'),
+                        "file_type": file_type
+                    })
+                    
+        return str(run_root.absolute()), artifacts
         
     def store_file(self, run_id: str, file_name: str, file_bytes: bytes) -> str:
         """

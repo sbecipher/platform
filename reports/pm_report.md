@@ -1,0 +1,201 @@
+# PM Decision Memo
+
+Run Context: RUN_ID `pm-lp-scm-20260624T212419Z`; run_root `output/runs/pm-lp-scm-20260624T212419Z`. All artifact references are relative to `run_root`; source aliases resolve in `## Source Key`.
+
+## Decision Recommendation
+
+Approve the post-deployment `min_variance` mandate portfolio for PM implementation as a risk-controlled book, not as a positive expected-return forecast. The run selected 38 [portfolio_size_selection] active equity positions plus the cash/opportunity sleeve, with 80.00% [post_deployment_portfolio_summary] target equity and 20.00% [post_deployment_portfolio_summary] cash/opportunity sleeve weight across 39 [post_deployment_portfolio_summary] post-deployment lines. The binding caveat is that book-level forward E[R] means sleeve-inclusive and is negative at -5.52% [forward_expected_returns_summary]; the equity-sleeve/equity-weighted forward E[R] is -6.91% [forward_expected_returns_summary], so approval rests on volatility control, capacity, and governance repair rather than return accretion.
+
+Implementation readiness is `trade_ready` [implementation_readiness_status] with 0 [implementation_readiness_status] blocking tickers and no listed binding governance breaches in the held book [governance_capital_constraints]. Institutional clearance is not requested and must not be described as institutionally cleared; the clearance artifact status is `not_requested` [institutional_clearance_status].
+
+## Selected Portfolio And Changes
+
+The target equity book has 38 [target_equity_portfolio] selected equity rows, while the post-deployment portfolio has 39 [post_deployment_portfolio_summary] lines after adding SCYB and residual cash inside the cash/opportunity sleeve. The sleeve is a standing post-deployment component; this report does not use staged-deployment framing. Current selected size is 38 [portfolio_size_selection] active equities versus 46 [portfolio_size_selection] active equities in the comparison portfolio.
+
+| Sleeve / book line | Weight | Action |
+|---|---:|---|
+| Target equity sleeve | 80.00% [post_deployment_portfolio_summary] | Hold the selected model target and monitor risk and valuation caveats. |
+| Cash/opportunity sleeve total | 20.00% [post_deployment_portfolio_summary] | Hold as standing sleeve, not a staging bucket. |
+| SCYB instrument inside sleeve | 4.63% [cash_opportunity_sleeve] | Hold as high-yield credit ETF instrument; not Treasury cash, not risk-free, and not a cash substitute. |
+| Residual CASH inside sleeve | 15.37% [cash_opportunity_sleeve] | Hold as residual settlement liquidity. |
+
+## Why This Portfolio Won
+
+![Efficient Frontier](output/runs/pm-lp-scm-20260624T212419Z/01_optimization_core/efficient_frontier.png)
+
+The selected `min_variance` variant has validation Sharpe 1.6724 [portfolio_size_selection], in-sample Sharpe 1.0249 [portfolio_size_selection], and shrunk selection score 1.0264 [portfolio_size_selection]. The comparison `min_variance` portfolio has validation Sharpe 1.7160 [portfolio_size_selection] and shrunk selection score 1.0241 [portfolio_size_selection]. The IS/OOS Sharpe decay is floored at 0.0000 [selection_decay_diagnostics] because validation Sharpe exceeded in-sample Sharpe; that rests on a single validation regime, with CV Sharpe mean 1.2858 [selection_decay_diagnostics], std 1.0057 [selection_decay_diagnostics], min 0.1461 [selection_decay_diagnostics], and 4 folds, so it is a robustness caveat rather than proof.
+
+Size-tier ranges remain monitoring items: Large actual 43.14% [portfolio_size_selection], Small actual 29.52% [portfolio_size_selection], Mid actual 14.38% [portfolio_size_selection], and Micro actual 12.96% [portfolio_size_selection]. The artifact marks size-tier hard constraints disabled and passable with monitoring rather than a deployment blocker [portfolio_size_selection].
+
+## Position-Level PM View
+
+| Ticker | Target weight | Forward E[R] | Mandate bucket | Valuation flag | Vol/CVaR contribution | PM action |
+|---|---:|---:|---|---|---:|---|
+| MT | 6.063819% [target_equity_portfolio] | 0.989086% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 6.589191% / 7.276075% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| STLD | 5.983926% [target_equity_portfolio] | -5.378231% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 5.703407% / 5.647032% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| MP | 0.625000% [target_equity_portfolio] | -10.630533% [forward_expected_returns] | rare_earth_critical_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.942416% / 0.764671% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.83>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| LEU | 0.625000% [target_equity_portfolio] | -12.412834% [forward_expected_returns] | uranium_nuclear_fuel | needs_adjusted_noa_review; NOPAT non-negative or not flagged [roim_valuation] | 0.930180% / 0.894171% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.98>0.5) |
+| CMP | 2.649215% [target_equity_portfolio] | -18.027611% [forward_expected_returns] | industrial_minerals_chemicals | valued; NOPAT non-negative or not flagged [roim_valuation] | 2.754533% / 2.533929% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.58>0.5) |
+| TMC | 0.625000% [target_equity_portfolio] | 8.197767% [forward_expected_returns] | critical_minerals | roim_not_applicable_project_nav_required; negative-NOPAT [roim_valuation] | 1.044540% / 0.981945% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.09>0.5)|weak_valuation(roim_not_applicable_project_nav_required)|negative_nopat |
+| HBM | 0.625000% [target_equity_portfolio] | 4.335986% [forward_expected_returns] | base_metals_copper | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.873198% / 1.052920% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.56>0.5) |
+| UAMY | 0.625000% [target_equity_portfolio] | -11.443711% [forward_expected_returns] | specialty_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.251845% / 0.891039% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.26>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| IDR | 2.500862% [target_equity_portfolio] | -7.143872% [forward_expected_returns] | critical_minerals | valued; NOPAT non-negative or not flagged [roim_valuation] | 3.338979% / 3.357791% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.79>0.5) |
+| LTBR | 0.625000% [target_equity_portfolio] | -11.508403% [forward_expected_returns] | uranium_nuclear_fuel | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.197600% / 1.168545% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.38>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| IPX | 2.064310% [target_equity_portfolio] | -11.674873% [forward_expected_returns] | titanium_advanced_materials | valued_negative_nopat; negative-NOPAT [roim_valuation] | 2.739169% / 2.969464% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.77>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| ABAT | 0.625000% [target_equity_portfolio] | -11.007149% [forward_expected_returns] | battery_recycling | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.082041% / 0.840701% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.35>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| NB | 0.625014% [target_equity_portfolio] | -10.624078% [forward_expected_returns] | critical_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.894938% / 0.832818% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.02>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| TMQ | 0.625000% [target_equity_portfolio] | -15.534345% [forward_expected_returns] | base_metals_copper | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.400174% / 0.924638% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.87>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| UUUU | 0.625000% [target_equity_portfolio] | -9.138105% [forward_expected_returns] | uranium_rare_earth_critical_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.016941% / 0.971568% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.82>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| CENX | 0.625000% [target_equity_portfolio] | 30.983618% [forward_expected_returns] | aluminum | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.903004% / 0.855281% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.69>0.5) |
+| HCC | 0.625002% [target_equity_portfolio] | -21.531176% [forward_expected_returns] | metallurgical_coal | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.598923% / 0.583165% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.53>0.5) |
+| CCJ | 4.259932% [target_equity_portfolio] | -23.265030% [forward_expected_returns] | uranium_nuclear_fuel | valued; NOPAT non-negative or not flagged [roim_valuation] | 4.752554% / 5.377656% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.53>0.5) |
+| SQM | 3.526695% [target_equity_portfolio] | 4.131226% [forward_expected_returns] | specialty_materials | valued; NOPAT non-negative or not flagged [roim_valuation] | 3.459508% / 3.498913% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| UEC | 0.625000% [target_equity_portfolio] | -11.247071% [forward_expected_returns] | uranium_nuclear_fuel | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.929280% / 0.943676% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.75>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| BTU | 0.625001% [target_equity_portfolio] | -12.329642% [forward_expected_returns] | coal | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.595430% / 0.483136% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.57>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| METC | 0.625000% [target_equity_portfolio] | -12.515482% [forward_expected_returns] | metallurgical_coal | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.963772% / 0.843631% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.91>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| GGB | 8.749999% [target_equity_portfolio] | 50.963327% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 8.061360% / 8.007904% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| SCCO | 3.934209% [target_equity_portfolio] | -9.676919% [forward_expected_returns] | base_metals_copper | valued; NOPAT non-negative or not flagged [roim_valuation] | 4.625472% / 5.271661% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| LAC | 0.625000% [target_equity_portfolio] | -12.433090% [forward_expected_returns] | battery_materials_lithium | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.133053% / 1.007746% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.07>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| TX | 12.500000% [target_equity_portfolio] | -34.434489% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 10.377556% / 10.050901% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| RS | 18.750000% [target_equity_portfolio] | -5.178337% [forward_expected_returns] | steel_distribution | valued; NOPAT non-negative or not flagged [roim_valuation] | 13.019653% / 13.679002% [risk_budget_analysis] | monitor / monitor; haircut reasons: none |
+| USAR | 0.625002% [target_equity_portfolio] | -12.076986% [forward_expected_returns] | rare_earth_critical_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.998729% / 0.678912% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(1.27>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| CMC | 0.625005% [target_equity_portfolio] | -24.195174% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.604178% / 0.611780% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| MTRN | 4.780879% [target_equity_portfolio] | -18.367751% [forward_expected_returns] | specialty_materials | valued; NOPAT non-negative or not flagged [roim_valuation] | 4.760044% / 4.474461% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| KALU | 0.625002% [target_equity_portfolio] | -6.667538% [forward_expected_returns] | aluminum | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.682185% / 0.652692% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| RYZ | 0.625001% [target_equity_portfolio] | -15.611297% [forward_expected_returns] | steel_distribution | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.677810% / 0.670897% [risk_budget_analysis] | PM-approved monitor; haircut reasons: weak_valuation(valued_negative_nopat)|negative_nopat |
+| WS | 0.625000% [target_equity_portfolio] | 0.372591% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.709453% / 0.629454% [risk_budget_analysis] | Hold / monitor; haircut reasons: high_vol(0.50>0.5) |
+| NUE | 0.625117% [target_equity_portfolio] | -5.856816% [forward_expected_returns] | steel | valued; NOPAT non-negative or not flagged [roim_valuation] | 0.561848% / 0.522266% [risk_budget_analysis] | Hold / monitor; haircut reasons: none |
+| ALB | 0.625000% [target_equity_portfolio] | -16.415107% [forward_expected_returns] | battery_materials_lithium | valued_negative_nopat; negative-NOPAT [roim_valuation] | 0.779109% / 0.854236% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.61>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| IE | 0.625000% [target_equity_portfolio] | -13.353671% [forward_expected_returns] | critical_minerals | valued_negative_nopat; negative-NOPAT [roim_valuation] | 1.043677% / 1.250463% [risk_budget_analysis] | PM-approved monitor; haircut reasons: high_vol(0.75>0.5)|weak_valuation(valued_negative_nopat)|negative_nopat |
+| CNR | 4.588969% [target_equity_portfolio] | -17.274778% [forward_expected_returns] | coal | valued_negative_nopat; negative-NOPAT [roim_valuation] | 3.662042% / 2.955954% [risk_budget_analysis] | PM-approved monitor; haircut reasons: weak_valuation(valued_negative_nopat)|negative_nopat |
+| SXC | 4.647037% [target_equity_portfolio] | -15.164747% [forward_expected_returns] | coke_processing | valued_negative_nopat; negative-NOPAT [roim_valuation] | 4.342206% / 4.988907% [risk_budget_analysis] | PM-approved monitor; haircut reasons: weak_valuation(valued_negative_nopat)|negative_nopat |
+
+## Position-Level Investment Case
+
+The selected portfolio is PM-approved for implementation with per-name monitoring rather than broad return enthusiasm. Every held name above is tied to its current mandate bucket, blended forward expected-return estimate, valuation state, risk-budget contribution, and any active PM exception from run-scoped artifacts. For the PM-approved exception set, the required thesis disclosure is:
+
+| Ticker | Selected weight | Approved full-book band | Required PM thesis and caveat |
+|---|---:|---|---|
+| ABAT | 0.625000% [target_equity_portfolio] | 0.250000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 0.750000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve ABAT as a small battery-recycling and circular-supply-chain exposure. The thesis is materials recovery and domestic battery-metal optionality, while negative NOPAT and early execution risk require a narrow starter band. [pm_exception_register] |
+| ALB | 0.625000% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve ALB inside a 0%-10% full-book range as lithium and battery-materials exposure linked to the fund's electrification and supply-chain materials thesis. The position must be sized as cyclical lithium optionality: negative NOPAT, lithium price compression, and incomplete valuation readiness remain explicit caveats and require continued monitoring. [pm_exception_register] |
+| BTU | 0.625001% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 0.500001% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve BTU inside a 0%-10% full-book range as cyclical coal and metallurgical-coal optionality supporting steel and energy-materials exposure. The PM approval depends on cycle-normalized economics and cash generation recovering from negative NOPAT, with carbon, regulatory, and coal price risks carried as explicit monitoring conditions. [pm_exception_register] |
+| CNR | 4.588969% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 3.660000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 3.671175% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve CNR inside a 0%-10% full-book range as a scaled coal and metallurgical-coal exposure supporting the steel supply-chain and industrial-materials thesis. The target reflects optimizer demand for the exposure, but negative NOPAT, coal-cycle volatility, and balance-sheet sensitivity must be carried as active caveats. [pm_exception_register] |
+| IE | 0.625000% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve IE inside a 0%-10% full-book range as US copper and critical-minerals development exposure tied to the fund's electrification and domestic supply-chain thesis. The position is project-stage optionality, not valuation-ready mature operating exposure; negative NOPAT, financing, permitting, and milestone execution require continued monitoring. [pm_exception_register] |
+| LAC | 0.625000% [target_equity_portfolio] | 0.250000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 1.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve LAC as a development-stage lithium exposure linked to the battery-materials thesis, specifically with project-NAV framing. Reports must preserve the pre-revenue/project-development caveat and present it as not valuation-ready on operating fundamentals. [pm_exception_register] |
+| METC | 0.625000% [target_equity_portfolio] | 0.250000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 1.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve METC as a domestic industrial-materials and metallurgical-coal exposure supporting the steel supply-chain thesis. This is not a clean critical-minerals approval; reports should frame it as cyclical industrial-base exposure with negative-NOPAT caveats. [pm_exception_register] |
+| MP | 0.625000% [target_equity_portfolio] | 0.250000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 1.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve MP as a controlled rare-earths and magnet-supply-chain exposure tied to the fund's national-security materials thesis. The approval is strategic, not valuation-led: fundamentals show negative NOPAT and the position should remain capped as an optionality exposure. [pm_exception_register] |
+| NB | 0.625014% [target_equity_portfolio] | 0.500000% [pm_exception_register] min / 0.810000% [pm_exception_register] target / 1.250000% [pm_exception_register] cap | Full-book implemented 0.500011% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve NB as a critical-minerals exposure tied to niobium, scandium, and titanium supply-chain diversification. The position can be modestly larger than the starter names because the current optimizer weight is higher, but negative NOPAT keeps it capped. [pm_exception_register] |
+| RYZ | 0.625001% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 0.500001% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve RYZ inside a 0%-10% full-book range as a steel-distribution and scrap-linked industrial base exposure. The economics depend on volume, spread, inventory, and working-capital normalization; negative NOPAT and limited current valuation support must be disclosed as active caveats. [pm_exception_register] |
+| SXC | 4.647037% [target_equity_portfolio] | 0.000000% [pm_exception_register] min / 3.730000% [pm_exception_register] target / 10.000000% [pm_exception_register] cap | Full-book implemented 3.717630% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve SXC inside a 0%-10% full-book range as coke-processing and coking-coal exposure tied to steel feedstock economics. The PM thesis rests on contract cash flows, utilization, and steel-production demand recovering from negative NOPAT; carbon and customer-concentration risks remain active monitoring items. [pm_exception_register] |
+| UAMY | 0.625000% [target_equity_portfolio] | 0.250000% [pm_exception_register] min / 0.500000% [pm_exception_register] target / 0.750000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve UAMY as a small domestic antimony exposure linked to defense and battery-materials supply-chain resilience. Because the company is micro-cap and negative-NOPAT, the position must stay below a tighter cap than broader critical-minerals names. [pm_exception_register] |
+| UEC | 0.625000% [target_equity_portfolio] | 1.000000% [pm_exception_register] min / 1.500000% [pm_exception_register] target / 2.000000% [pm_exception_register] cap | Full-book implemented 0.500000% [post_deployment_portfolio]. PM-approved full-book range; not valuation-ready, not fully cleared, and not an underwriteable conclusion without ongoing diligence. Negative-NOPAT caveat applies. Approve UEC as the largest of this group because it directly supports the uranium and nuclear-fuel security thesis and is already selected at a higher optimizer weight. Negative NOPAT remains the binding caveat, so the cap stays materially below ordinary max-name limits. [pm_exception_register] |
+
+TECK has an active taxonomy PM approval in the exception register but is not a held line in the current target equity artifact [pm_exception_register] [target_equity_portfolio]. Candidate universe names such as UUUU, IPX, and ELBM are not described as holdings unless the selected/current portfolio artifacts show them as held; in this run UUUU and IPX are held, while ELBM is not held [target_equity_portfolio].
+
+## Risk Budget And Active Exposures
+
+![Risk Contribution](output/runs/pm-lp-scm-20260624T212419Z/01_optimization_core/risk_contribution.png)
+
+![Factor Exposure 38 Equity Cash Mandate Portfolio](output/runs/pm-lp-scm-20260624T212419Z/05_factor_model/factor_exposure_38_equity_cash_mandate_portfolio.png)
+
+Risk-budget readiness is clean for deployment: selected monitor count is 37 [implementation_readiness_status], and every selected risk-budget row has no hard breach [risk_budget_analysis]. The largest vol contribution is RS at 13.02% [risk_budget_analysis], matching the canonical risk-budget analysis. The portfolio uses 463 trading days with a 252 trading-day annualization assumption for annualized risk, VaR, CVaR, Sharpe, and drawdown language.
+
+Active risk versus XME is material but measured: tracking error is 16.44% [tracking_error_summary] and active share is 60.71% [tracking_error_summary]. Historical VaR95 is -2.11% [institutional_risk_summary] versus SPY VaR95 of -1.64% [institutional_risk_summary], so the portfolio VaR is more adverse than SPY by 0.47%.
+
+## Liquidity And Capacity Constraints
+
+![Liquidity Dashboard](output/runs/pm-lp-scm-20260624T212419Z/03_expanded/liquidity_dashboard.png)
+
+Selected capacity rows are all selected correctly in the policy artifact, and the limiting selected policy AUM is $9,610,136 [capacity_policy]. SCYB liquidity distinguishes the full sleeve trade from actual SCYB instrument exposure: current sleeve trade dollars are $1,000,000 [etf_liquidity_diligence_summary], while current SCYB instrument trade dollars are $231,374 [etf_liquidity_diligence_summary]. ETF depth is documented in the ETF liquidity diligence artifact, and the ETF liquidity evidence status is `approved` [etf_liquidity_diligence_summary].
+
+## Valuation Flags And Thesis Exceptions
+
+![Roim Valuation Scatter](output/runs/pm-lp-scm-20260624T212419Z/13_valuation/roim_valuation_scatter.png)
+
+Valuation coverage passes on a combined trailing-ROIM-or-forward-consensus basis: status `pass` [governance_gates], basis `trailing_roim_claim_ready_or_forward_consensus_roim` [governance_gates], coverage 81.58% [governance_gates], primary ROIM claim-ready count 18 [governance_gates], supplemental forward-consensus valuation count 13 [governance_gates], and selected equity count 38 [governance_gates]. Supplemental forward-consensus support is labeled separately and is not clean trailing-ROIM coverage. Exception-cap breaches are 0 [governance_capital_constraints], so the PM exception remediation is not blocking the current book.
+
+SBIC is catalyst context only: eligible-or-likely tickers total 3 [sbic_summary], while report-supported SBIC claim-ready count is 2 [sbic_eligibility]; this is not legal advice or a financing conclusion. Capital imbalance is a supplemental report-only NAV lens with 2 [capital_imbalance_summary] claim-ready rows and configured copper price 4.50 [capital_imbalance_price_provenance] from RIC CMCU3; the configured copper price is 4.50 [capital_imbalance_price_provenance]; it does not replace ROIM and does not drive optimizer weights.
+
+## Cash Opportunity Sleeve And Implementation
+
+The cash/opportunity sleeve total is 20.00% [post_deployment_portfolio_summary]. SCYB is only 4.63% [cash_opportunity_sleeve] of the total portfolio and 23.14% [etf_liquidity_diligence_summary] of the sleeve internally; the remainder is CASH at 15.37% [cash_opportunity_sleeve]. SCYB is an approved high-yield credit ETF instrument inside the cash/opportunity sleeve, not Treasury cash, not risk-free, and not a cash substitute [cash_opportunity_sleeve_policy] [credit_sleeve_analysis]. Credit-sleeve allocation scope is `actual_portfolio_weight` [credit_sleeve_analysis] and actual portfolio SCYB allocation is 4.63% [credit_sleeve_analysis].
+
+## Monitoring Triggers
+
+Rebalance monitoring uses the run's rebalance_actions.csv and is summarized here as truncated; the full artifact contains a truncated row set covering every selected line [rebalance_actions] covering every selected equity and the cash/opportunity sleeve [rebalance_actions]. Immediate PM monitoring priorities are negative book-level forward E[R], PM exception thesis triggers, commodity and severe stress, VaR versus SPY, and size-tier drift. Commodity and stress monitoring should use commodity_direct_stress.csv, severe_stress_scenarios.csv, cash_sleeve_stress_scenarios.csv, and scyb_credit_stress.csv rather than ad hoc thresholds [commodity_direct_stress] [severe_stress_scenarios] [cash_sleeve_stress_scenarios] [scyb_credit_stress].
+
+## Required Outputs And Data Provenance
+
+The artifact manifest lists no missing rows [artifact_manifest]. Selected-name source-date freshness status is `pass` [governance_gates] across 38 [governance_gates] selected names; market value and volume oldest source dates are 2026-06-17 [governance_gates], price oldest source date is 2026-06-23 [governance_gates], and volatility/SMA source dates are 2026-06-24 [governance_gates]. The local primary data-lake path was used for the workflow, with live LSEG OHLCV metric supplementation before the rerun; no report section uses `--offline` or `--use-cache` data.
+
+## Source Key
+
+- [03_expanded_capacity_policy] = `03_expanded/capacity_policy.json`
+- [06_institutional_institutional_risk_summary] = `06_institutional/institutional_risk_summary.json`
+- [artifact_manifest] = `reports/artifact_manifest.json`
+- [capacity_clearance_reconciliation] = `03_expanded/capacity_clearance_reconciliation.json`
+- [capacity_policy] = `03_expanded/capacity_policy.csv`
+- [capital_imbalance_price_provenance] = `13_valuation/capital_imbalance_price_provenance.csv`
+- [capital_imbalance_sensitivity] = `13_valuation/capital_imbalance_sensitivity.csv`
+- [capital_imbalance_summary] = `13_valuation/capital_imbalance_summary.json`
+- [capital_imbalance_valuation] = `13_valuation/capital_imbalance_valuation.csv`
+- [cash_opportunity_sleeve] = `02_implementation/cash_opportunity_sleeve.csv`
+- [cash_opportunity_sleeve_capacity_summary] = `03_expanded/cash_opportunity_sleeve_capacity_summary.json`
+- [cash_opportunity_sleeve_policy] = `02_implementation/cash_opportunity_sleeve_policy.json`
+- [cash_opportunity_waterfall] = `02_implementation/cash_opportunity_waterfall.csv`
+- [cash_sleeve_stress_scenarios] = `06_institutional/cash_sleeve_stress_scenarios.csv`
+- [commodity_direct_stress] = `03_expanded/commodity_direct_stress.csv`
+- [commodity_scenarios] = `03_expanded/commodity_scenarios.csv`
+- [consensus_estimates] = `06_institutional/consensus_estimates.csv`
+- [consensus_field_coverage] = `06_institutional/consensus_field_coverage.csv`
+- [credit_sleeve_analysis] = `06_institutional/credit_sleeve_analysis.csv`
+- [drawdown_summary] = `03_expanded/drawdown_summary.csv`
+- [efficient_size_portfolios] = `01_optimization_core/efficient_size_portfolios.json`
+- [equity_sleeve_capacity_summary] = `03_expanded/equity_sleeve_capacity_summary.json`
+- [etf_liquidity_diligence_summary] = `03_expanded/etf_liquidity_diligence_summary.csv`
+- [factor_attribution] = `03_expanded/factor_attribution.csv`
+- [factor_model_manifest] = `05_factor_model/factor_model_manifest.json`
+- [factor_return_attribution] = `03_expanded/factor_return_attribution.csv`
+- [forward_expected_returns] = `14_calibration/forward_expected_returns.csv`
+- [forward_expected_returns_summary] = `14_calibration/forward_expected_returns_summary.json`
+- [governance_capital_constraints] = `06_institutional/governance_capital_constraints.csv`
+- [governance_gates] = `reports/governance_gates.json`
+- [implementation_readiness_status] = `reports/implementation_readiness_status.json`
+- [insights_context] = `reports/insights_context.json`
+- [institutional_clearance_status] = `reports/institutional_clearance_status.json`
+- [institutional_risk_summary] = `06_institutional/institutional_risk_summary.csv`
+- [liquidity_capacity] = `03_expanded/liquidity_capacity.csv`
+- [liquidity_dashboard] = `03_expanded/liquidity_dashboard.png`
+- [liquidity_evidence_quality] = `03_expanded/liquidity_evidence_quality.csv`
+- [liquidity_quality_summary] = `03_expanded/liquidity_quality_summary.csv`
+- [model_limitations] = `reports/model_limitations.md`
+- [pm_exception_register] = `06_institutional/pm_exception_register.csv`
+- [portfolio_size_comparison] = `01_optimization_core/portfolio_size_comparison.csv`
+- [portfolio_size_selection] = `01_optimization_core/portfolio_size_selection.json`
+- [post_deployment_capacity_summary] = `03_expanded/post_deployment_capacity_summary.json`
+- [post_deployment_portfolio] = `02_implementation/post_deployment_portfolio.csv`
+- [post_deployment_portfolio_summary] = `02_implementation/post_deployment_portfolio_summary.json`
+- [post_deployment_state] = `02_implementation/post_deployment_state.json`
+- [rebalance_actions] = `reports/rebalance_actions.csv`
+- [rebalance_policy] = `reports/rebalance_policy.json`
+- [risk_budget_analysis] = `06_institutional/risk_budget_analysis.csv`
+- [risk_budget_by_position] = `03_expanded/risk_budget_by_position.csv`
+- [risk_budget_summary] = `03_expanded/risk_budget_summary.json`
+- [roim_sensitivity_summary] = `13_valuation/roim_sensitivity_summary.csv`
+- [roim_summary] = `13_valuation/roim_summary.json`
+- [roim_terminal_growth_sensitivity] = `13_valuation/roim_terminal_growth_sensitivity.csv`
+- [roim_valuation] = `13_valuation/roim_valuation.csv`
+- [roim_wacc_sensitivity] = `13_valuation/roim_wacc_sensitivity.csv`
+- [sbic_eligibility] = `14_calibration/sbic_eligibility.csv`
+- [sbic_summary] = `14_calibration/sbic_summary.json`
+- [scyb_credit_stress] = `06_institutional/scyb_credit_stress.csv`
+- [sector_return_attribution] = `03_expanded/sector_return_attribution.csv`
+- [security_taxonomy_quality] = `06_institutional/security_taxonomy_quality.csv`
+- [selected_portfolio] = `01_optimization_core/selected_portfolio.csv`
+- [selection_decay_diagnostics] = `01_optimization_core/selection_decay_diagnostics.csv`
+- [severe_stress_scenarios] = `06_institutional/severe_stress_scenarios.csv`
+- [sleeve_risk_analysis] = `06_institutional/sleeve_risk_analysis.csv`
+- [target_equity_portfolio] = `01_optimization_core/target_equity_portfolio.csv`
+- [target_equity_portfolio_summary] = `01_optimization_core/target_equity_portfolio_summary.json`
+- [thesis_alignment_context] = `reports/thesis_alignment_context.csv`
+- [tracking_error_summary] = `06_institutional/tracking_error_summary.csv`

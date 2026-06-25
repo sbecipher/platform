@@ -94,11 +94,11 @@ export const HoldingsGrid = () => {
         style={{ flex: 1, overflow: 'auto', position: 'relative' }}
       >
         <table className="modern-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-panel)', zIndex: 1 }}>
+          <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-panel)', zIndex: 1, display: 'flex', width: '100%' }}>
             {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
+              <tr key={headerGroup.id} style={{ display: 'flex', width: '100%' }}>
                 {headerGroup.headers.map(header => (
-                  <th key={header.id} style={{ padding: '12px 24px', textAlign: 'left', borderBottom: '1px solid var(--border-color)', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                  <th key={header.id} style={{ flex: 1, padding: '12px 24px', textAlign: 'left', borderBottom: '1px solid var(--border-color)', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -117,6 +117,7 @@ export const HoldingsGrid = () => {
                 <tr 
                   key={row.id}
                   style={{
+                    display: 'flex',
                     position: 'absolute',
                     top: 0,
                     left: 0,
@@ -125,7 +126,7 @@ export const HoldingsGrid = () => {
                   }}
                 >
                   {row.getVisibleCells().map(cell => (
-                    <td key={cell.id} style={{ padding: '12px 24px', borderBottom: '1px solid var(--border-glass)' }}>
+                    <td key={cell.id} style={{ flex: 1, padding: '12px 24px', borderBottom: '1px solid var(--border-glass)' }}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}

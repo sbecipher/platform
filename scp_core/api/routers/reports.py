@@ -24,8 +24,31 @@ async def ingest_run(run_id: str, file: UploadFile = File(...), db: Session = De
         tmp_path = tmp.name
         
     try:
-        run_root = artifact_store.store_run_archive(run_id, tmp_path)
-        return {"status": "success", "run_id": run_id, "run_root": run_root}
+        from scp_core.infrastructure.database.models import DiligenceRun, RunArtifact
+        import datetime
+        run_root, artifacts = artifact_store.store_run_archive(run_id, tmp_path)
+        
+        # Upsert DiligenceRun
+        run = db.query(DiligenceRun).filter(DiligenceRun.run_id == run_id).first()
+        if not run:
+            run = DiligenceRun(run_id=run_id, run_date=datetime.datetime.utcnow(), status="DRAFT")
+            db.add(run)
+            
+        # Delete existing artifacts for this run
+        db.query(RunArtifact).filter(RunArtifact.run_id == run_id).delete()
+        
+        # Insert new artifacts
+        for art in artifacts:
+            db_art = RunArtifact(
+                run_id=run_id,
+                source_key=art['source_key'],
+                file_path=art['file_path'],
+                file_type=art['file_type']
+            )
+            db.add(db_art)
+            
+        db.commit()
+        return {"status": "success", "run_id": run_id, "run_root": run_root, "artifacts_count": len(artifacts)}
     finally:
         os.unlink(tmp_path)
 
@@ -73,12 +96,15 @@ async def generate_daily_pms_monitor_pdf(db: Session = Depends(get_db)):
     return Response(content=pdf_bytes, media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=pms_daily_monitor.pdf"})
 
 @router.get("/{run_id}/markdown")
-async def generate_lp_diligence_brief(run_id: str, db: Session = Depends(get_db)):
+async def generate_markdown_report(run_id: str, report_type: str = "lp_brief", db: Session = Depends(get_db)):
     """
-    Generates the LP Due-Diligence brief based on the given run_id.
+    Generates the markdown report based on report_type.
     """
     builder = ReportingContextBuilder(db_session=db)
-    markdown = builder.generate_lp_brief(run_id)
+    if report_type == "pm_report":
+        markdown = builder.generate_pm_report(run_id)
+    else:
+        markdown = builder.generate_lp_brief(run_id)
     return {
         "status": "success",
         "markdown_content": markdown

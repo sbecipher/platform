@@ -65,7 +65,16 @@ export default function ReportViewer({ reportType = 'daily', runId = '' }) {
         )}
 
         {!loading && !error && markdown && (
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              img: ({node, ...props}) => {
+                // Ensure image src has a leading slash for absolute pathing relative to domain root
+                const src = props.src?.startsWith('/') ? props.src : `/${props.src}`;
+                return <img {...props} src={src} className="w-full h-auto rounded shadow-md my-4 border border-slate-700" alt={props.alt || ''} />;
+              }
+            }}
+          >
             {markdown}
           </ReactMarkdown>
         )}

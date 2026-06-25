@@ -145,3 +145,66 @@ body {
 .modern-table tbody tr:hover {
   background-color: var(--bg-secondary);
 }
+
+/* Modern Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+  height: calc(100vh - 70px);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.dashboard-panel-main {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-panel-side-top {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-panel-side-bottom {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Responsive collapse for tablets and mobile */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+    min-height: calc(100vh - 70px);
+  }
+  
+  .dashboard-panel-main {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    min-height: 500px;
+  }
+  
+  .dashboard-panel-side-top {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    min-height: 400px;
+  }
+  
+  .dashboard-panel-side-bottom {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+    min-height: 400px;
+  }
+}

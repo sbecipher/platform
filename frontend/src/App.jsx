@@ -62,8 +62,23 @@ const Header = () => {
   
   return (
     <header className="glass-panel" style={{ height: '70px', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', borderBottom: '1px solid var(--border-glass)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
         <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Sbecipher Terminal</h1>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginLeft: '24px', borderLeft: '1px solid var(--border-color)', paddingLeft: '24px' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Total NAV</div>
+            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>$1,000,000.00</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Day PnL</div>
+            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--status-positive)' }}>+$4,500.00 (0.45%)</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Net Exp</div>
+            <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>85.0%</div>
+          </div>
+        </div>
       </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>

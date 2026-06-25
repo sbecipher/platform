@@ -1,6 +1,6 @@
 # Institutional LP Due-Diligence Brief
 
-Run Context: RUN_ID `{{ run_id }}`; run_root `output/runs/{{ run_id }}`. All artifact references are relative to `run_root`; source aliases resolve in `## Source Key`.
+Run Context: RUN_ID `pm-lp-scm-20260624T212419Z`; run_root `output/runs/pm-lp-scm-20260624T212419Z`. All artifact references are relative to `run_root`; source aliases resolve in `## Source Key`.
 
 ## Strategy Overview
 
@@ -77,9 +77,9 @@ PM-approved exception theses are fiduciary caveats, not underwriteable conclusio
 
 ## Risk And Drawdown Profile
 
-![Drawdown Expanded](output/runs/{{ run_id }}/03_expanded/drawdown_expanded.png)
+![Drawdown Expanded](output/runs/pm-lp-scm-20260624T212419Z/03_expanded/drawdown_expanded.png)
 
-![Var Cvar Distribution](output/runs/{{ run_id }}/06_institutional/var_cvar_distribution.png)
+![Var Cvar Distribution](output/runs/pm-lp-scm-20260624T212419Z/06_institutional/var_cvar_distribution.png)
 
 Historical max drawdown is -20.92% [institutional_risk_summary], VaR95 is -2.11% [institutional_risk_summary], and CVaR95 is -3.02% [institutional_risk_summary]. The portfolio VaR95 is more adverse than SPY by 0.47%, with portfolio VaR95 -2.11% [institutional_risk_summary] versus SPY VaR95 -1.64% [institutional_risk_summary]. Risk metrics use 463 trading days and a 252 trading-day annualization assumption.
 
@@ -87,15 +87,15 @@ Risk-budget hard-breach flags are false for every selected row [risk_budget_anal
 
 ## Valuation Framework
 
-![Roim Valuation Scatter](output/runs/{{ run_id }}/13_valuation/roim_valuation_scatter.png)
+![Roim Valuation Scatter](output/runs/pm-lp-scm-20260624T212419Z/13_valuation/roim_valuation_scatter.png)
 
-![Roim Waterfall](output/runs/{{ run_id }}/13_valuation/roim_waterfall.png)
+![Roim Waterfall](output/runs/pm-lp-scm-20260624T212419Z/13_valuation/roim_waterfall.png)
 
 Valuation coverage gate status is `pass` [governance_gates], basis `trailing_roim_claim_ready_or_forward_consensus_roim` [governance_gates], coverage 81.58% [governance_gates], covered count 31 [governance_gates], primary ROIM claim-ready count 18 [governance_gates], supplemental forward-consensus valuation count 13 [governance_gates], and selected equity count 38 [governance_gates]. ROIM remains the primary framework [roim_summary]; capital imbalance is a supplemental report-only NAV lens with 2 [capital_imbalance_summary] claim-ready rows, configured copper price 4.50 [capital_imbalance_price_provenance], and caveat `configured_spot_override` [capital_imbalance_price_provenance]. SBIC context has 3 [sbic_summary] eligible-or-likely tickers and is not legal advice or a financing conclusion [sbic_summary].
 
 ## Liquidity Capacity And Scalability
 
-![Liquidity Dashboard](output/runs/{{ run_id }}/03_expanded/liquidity_dashboard.png)
+![Liquidity Dashboard](output/runs/pm-lp-scm-20260624T212419Z/03_expanded/liquidity_dashboard.png)
 
 Selected capacity rows indicate a limiting selected policy AUM of $9,610,136 [capacity_policy]. SCYB ETF depth is documented in the ETF liquidity diligence artifact; current sleeve trade dollars are $1,000,000 [etf_liquidity_diligence_summary], and current SCYB instrument trade dollars are $231,374 [etf_liquidity_diligence_summary]. These measures distinguish full-sleeve liquidity from actual SCYB instrument liquidity.
 
@@ -113,7 +113,7 @@ Selected-name source-date freshness status is `pass` [governance_gates] across 3
 
 ## Scenario And Stress Testing
 
-![Commodity Scenarios Chart](output/runs/{{ run_id }}/03_expanded/commodity_scenarios_chart.png)
+![Commodity Scenarios Chart](output/runs/pm-lp-scm-20260624T212419Z/03_expanded/commodity_scenarios_chart.png)
 
 Commodity and severe-stress work should be read as model-output stress evidence, not forecasts. Commodity proxy coverage has uncovered proxy count 0 [commodity_direct_stress], and sleeve stress is governed through cash_sleeve_stress_scenarios.csv and scyb_credit_stress.csv [cash_sleeve_stress_scenarios] [scyb_credit_stress]. Precious-metals-primary exposure remains a strict mandate risk; commodity valuation claims must cite price provenance, including the configured copper override at 4.50 [capital_imbalance_price_provenance] and as-of date 2026-06-22 [capital_imbalance_price_provenance].
 

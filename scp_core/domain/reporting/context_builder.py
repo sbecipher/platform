@@ -55,15 +55,85 @@ class ReportingContextBuilder:
         template = self.env.get_template("pms_daily_monitor.md.j2")
         return template.render(**context)
 
+    def _load_run_context(self, run_id: str) -> dict:
+        """Loads JSON scalars, CSVs and merges them into context"""
+        import json
+        run_root = Path("output/runs") / run_id
+        context = {"run_id": run_id}
+        
+        # Load JSON scalars
+        for root, _, files in os.walk(run_root):
+            for file in files:
+                if file.endswith('.json'):
+                    source_key = file.replace('.json', '')
+                    try:
+                        with open(os.path.join(root, file), 'r') as f:
+                            context[source_key] = json.load(f)
+                    except Exception as e:
+                        logger.error(f"Error loading JSON {file}: {e}")
+
+        # Build Pandas Investment Case Table
+        investment_case_table = []
+        try:
+            target_csv = list(run_root.glob('**/target_equity_portfolio.csv'))
+            fwd_csv = list(run_root.glob('**/forward_expected_returns.csv'))
+            roim_csv = list(run_root.glob('**/roim_valuation.csv'))
+            risk_csv = list(run_root.glob('**/risk_budget_analysis.csv'))
+            
+            if target_csv:
+                df_target = pd.read_csv(target_csv[0]).set_index('Ticker')
+                df_fwd = pd.read_csv(fwd_csv[0]).set_index('Ticker') if fwd_csv else pd.DataFrame()
+                df_roim = pd.read_csv(roim_csv[0]).set_index('Ticker') if roim_csv else pd.DataFrame()
+                df_risk = pd.read_csv(risk_csv[0]).set_index('Ticker') if risk_csv else pd.DataFrame()
+                
+                df_merged = df_target.join([df_fwd, df_roim, df_risk], how='outer').reset_index()
+                
+                # Merge PM Exceptions from DB
+                exceptions_dict = {}
+                if self.db:
+                    from scp_core.infrastructure.database.models import PMException
+                    excs = self.db.query(PMException).filter(PMException.is_active == True).all()
+                    for ex in excs:
+                        exceptions_dict[ex.ticker] = {
+                            "min": ex.approved_min,
+                            "target": ex.approved_target,
+                            "cap": ex.approved_cap,
+                            "caveat": ex.fiduciary_caveat
+                        }
+                
+                for _, row in df_merged.iterrows():
+                    ticker = row.get('Ticker', '')
+                    if not ticker or pd.isna(ticker): continue
+                    
+                    row_dict = row.to_dict()
+                    if ticker in exceptions_dict:
+                        row_dict['exception'] = exceptions_dict[ticker]
+                        row_dict['has_exception'] = True
+                    else:
+                        row_dict['has_exception'] = False
+                        
+                    investment_case_table.append(row_dict)
+                    
+        except Exception as e:
+            logger.error(f"Failed to build investment case table: {e}")
+            
+        context['investment_case_table'] = investment_case_table
+        return context
+
     def generate_lp_brief(self, run_id: str) -> str:
         """
         Generates the LP Brief Markdown.
         """
-        context = {
-            "run_id": run_id,
-            # Mock MVP data
-        }
+        context = self._load_run_context(run_id)
         template = self.env.get_template("lp_brief.md.j2")
+        return template.render(**context)
+        
+    def generate_pm_report(self, run_id: str) -> str:
+        """
+        Generates the PM Decision Memo Markdown.
+        """
+        context = self._load_run_context(run_id)
+        template = self.env.get_template("pm_report.md.j2")
         return template.render(**context)
 
     def generate_pdf_from_markdown(self, md_content: str) -> bytes:

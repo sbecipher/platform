@@ -1,9 +1,11 @@
 import asyncio
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uuid
 from contextlib import asynccontextmanager
+from sqlalchemy.orm import Session
+from scp_core.infrastructure.database.session import get_db
 
 # Import our new Pydantic Schemas
 from scp_core.models.schemas import (
@@ -20,6 +22,7 @@ from scp_core.api.routers.compliance import router as compliance_router
 from scp_core.api.routers.modeling import router as modeling_router
 from scp_core.api.routers.auth import router as auth_router
 from scp_core.api.routers.reports import router as reports_router
+from scp_core.api.routers.governance import router as governance_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,6 +37,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+from fastapi.staticfiles import StaticFiles
+import os
+
 # Enable CORS for the React Frontend
 app.add_middleware(
     CORSMiddleware,
@@ -43,41 +49,50 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+os.makedirs("output/runs", exist_ok=True)
+app.mount("/output/runs", StaticFiles(directory="output/runs"), name="runs")
+
 app.include_router(market_data_router)
 app.include_router(oms_router)
 app.include_router(compliance_router)
 app.include_router(modeling_router)
 app.include_router(auth_router)
 app.include_router(reports_router)
+app.include_router(governance_router)
 
 @app.get("/api/portfolio/{portfolio_id}", response_model=PortfolioHoldingsResponse, summary="Get Portfolio Holdings")
-def get_portfolio(portfolio_id: str):
+def get_portfolio(portfolio_id: str, db: Session = Depends(get_db)):
     """
-    Returns the real-time holdings and aggregated metrics for the requested portfolio.
-    This replaces the legacy `DashboardTable.cs` binding logic.
+    Returns the real-time holdings and aggregated metrics from PMSPositionSnapshot.
     """
-    # Mocked Response matching the Pydantic schema
+    from scp_core.infrastructure.database.models import PMSPositionSnapshot
+    positions_db = db.query(PMSPositionSnapshot).all()
+    
+    pos_responses = []
+    total_nav = sum(p.total_market_value for p in positions_db) or 1.0 # avoid div/0
+    
+    for p in positions_db:
+        pos_responses.append(PositionResponse(
+            id=str(p.id),
+            symbol=p.ticker,
+            asset_class="Equity",
+            quantity=p.shares,
+            market_value=p.total_market_value,
+            day_profit=0.0, # Not in CSV
+            exposure_pct=(p.total_market_value / total_nav) * 100
+        ))
+        
     return PortfolioHoldingsResponse(
         portfolio_id=portfolio_id,
         timestamp=datetime.utcnow(),
         metrics=PortfolioMetrics(
-            portfolio_nav=1000000.0,
-            gross_exposure_pct=110.5,
-            net_exposure_pct=85.0,
-            day_pnl=4500.0,
-            ytd_return_pct=12.4
+            portfolio_nav=total_nav,
+            gross_exposure_pct=sum(abs(p.exposure_pct) for p in pos_responses),
+            net_exposure_pct=sum(p.exposure_pct for p in pos_responses),
+            day_pnl=0.0,
+            ytd_return_pct=0.0
         ),
-        positions=[
-            PositionResponse(
-                id=str(uuid.uuid4()),
-                symbol="AAPL",
-                asset_class="Equity",
-                quantity=1500,
-                market_value=225000.0,
-                day_profit=1500.0,
-                exposure_pct=22.5
-            )
-        ]
+        positions=pos_responses
     )
 
 @app.post("/api/trade", response_model=TradeResponse, summary="Execute a Trade")

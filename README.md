@@ -16,7 +16,8 @@ Sbecipher is a modern, high-performance web application designed for quantitativ
 - **Real-Time Market Data**: WebSockets stream live LSEG tick data directly into a virtualized TanStack table, flashing cells dynamically based on price direction.
 - **Pre-Trade Compliance Engine**: A mathematical rules engine evaluating orders against the live IBOR portfolio snapshot to prevent single-stock concentration breaches prior to routing.
 - **Vectorized Rebalancing**: Target weights are computed against the active portfolio using pandas to calculate exact drift and whole-share buy/sell order recommendations.
-- **Role-Based Portals**: Delineated `AdminPortal` for adjusting compliance caps and FIX connections, versus a `UserPortal` and `LPStudio` for daily performance tracking.
+- **Quantitative Batch Analytics & Document Generation**: Ingest complex quantitative run artifacts (`.zip` CSVs/JSONs/PNGs), cross-reference qualitative Fiduciary PM Exceptions via the Exception Register, and dynamically stitch them into automated Institutional Markdown/PDF Briefs via Jinja2 templates and Pandas logic.
+- **Role-Based Portals**: Delineated `AdminPortal` for adjusting compliance caps and FIX connections, versus a `UserPortal` and `LPStudio` for daily performance tracking and document generation.
 
 ## Getting Started
 
