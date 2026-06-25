@@ -17,7 +17,7 @@ env:
   PROJECT_ID: data-cipher
   PROJECT_NUMBER: 875978034496
   LOCATION: us-central1
-  REPO: antigravity
+  REPO: sbiplatform
   IMAGE: scp-core
   SERVICE: ${{ vars.CLOUD_RUN_SERVICE || 'scp-core' }}
   RUNTIME_SERVICE_ACCOUNT: ${{ vars.CLOUD_RUN_SERVICE_ACCOUNT || 'project-service-account@data-cipher.iam.gserviceaccount.com' }}
